@@ -1,38 +1,44 @@
 const connection = require("../data/db");
 
-async function index(req, res) {
-  let sql = `SELECT * FROM movies`;
+function index(req, res) {
+  const sql = "SELECT * FROM movies";
 
-  try {
-    const [movies] = await connection.query(sql);
-    res.json(movies);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: err.message });
+    }
+    res.json(results);
+  });
 }
 
-async function show(req, res) {
+function show(req, res) {
   const id = req.params.id;
-  let sql = `SELECT * FROM movies WHERE id = ?`;
+  const sqlMovie = "SELECT * FROM movies WHERE id = ?";
 
-  try {
-    const [moviesResults] = await connection.query(sql, [id]);
-    if (moviesResults.length === 0) {
+  connection.query(sqlMovie, [id], (err, movieResults) => {
+    if (err) {
+      return res.status(500).json({ message: err.message });
+    }
+
+    if (movieResults.length === 0) {
       return res.status(404).json({
         error: "Not Found",
         message: "Movie not found",
       });
     }
 
-    const movie = moviesResults[0];
-    sql = `SELECT * FROM reviews WHERE movie_id = ?`;
-    const [reviewsResults] = await connection.query(sql, [id]);
-    movie.reviews = reviewsResults;
+    const movie = movieResults[0];
+    const sqlReviews = "SELECT * FROM reviews WHERE movie_id = ?";
 
-    res.json(movie);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+    connection.query(sqlReviews, [id], (err, reviewResults) => {
+      if (err) {
+        return res.status(500).json({ message: err.message });
+      }
+
+      movie.reviews = reviewResults;
+      res.json(movie);
+    });
+  });
 }
 
 module.exports = { index, show };
