@@ -7,7 +7,7 @@ const cors = require("cors");
 const app = express();
 const PORT = 3000;
 
-app.use(cors()); // Aggiungi questa riga per il CORS
+app.use(cors());
 app.use(express.json());
 app.use("/movies", moviesRouter);
 
