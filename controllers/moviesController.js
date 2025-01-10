@@ -25,7 +25,8 @@ function index(req, res) {
 // Funzione per ottenere un singolo film con recensioni
 function show(req, res) {
   const id = req.params.id;
-  const sqlMovie = "SELECT id, title, abstract FROM movies WHERE id = ?"; // Aggiunto anche l'immagine
+  const sqlMovie =
+    "SELECT id, title, abstract, image, director, release_year, genre FROM movies WHERE id = ?"; // Aggiunto anche l'immagine
 
   connection.query(sqlMovie, [id], (err, movieResults) => {
     if (err) {
